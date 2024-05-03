@@ -1,0 +1,91 @@
+#root {
+  height: 100vh;
+  .main_container {
+    height: 100%;
+  }
+  .table {
+    overflow-y: scroll;
+  }
+  .main_container {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .app-header {
+    padding: 0;
+    background: linear-gradient(to bottom, #dc3c10, #ff7f50);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* добавляем тень для высветления */
+  }
+
+  .app-content {
+    margin: 24px 16px;
+    padding: 24px;
+    min-height: 280px;
+    background: #fff;
+    border-radius: 8px;
+    overflow-y: scroll;
+  }
+  .logout {
+    margin-right: 15px;
+  }
+  .search_row {
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .main_table {
+    th,
+    td,
+    tr {
+      padding: 5px;
+    }
+  }
+  .main_table {
+    td {
+      text-align: center;
+    }
+    th {
+      text-align: center;
+    }
+  }
+  .datepicker_cust {
+    display: flex;
+    flex: 0 0 100%;
+  }
+  .create_row {
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .layout_cust {
+    background: url("../public/bg.jpg");
+  }
+
+  p {
+    margin-bottom: 0;
+  }
+  .ant-layout .ant-layout-sider {
+    background: #905c97;
+  }
+  .main_menu {
+    background: #905c97;
+  }
+}
+
+.form_row {
+  justify-content: space-between !important;
+  gap: 20px;
+}
+.date_space {
+  width: 100%;
+  display: block;
+}
+.trigger {
+  svg {
+    fill: #fff;
+  }
+}
+.dest_label {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
