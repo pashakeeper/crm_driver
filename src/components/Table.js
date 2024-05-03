@@ -15,6 +15,7 @@ const EditableTable = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [filterValue, setFilterValue] = useState('');
     const [form] = Form.useForm();
+    // eslint-disable-next-line
     const [newTruck, setNewTruck] = useState({});
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const [deletingTruckId, setDeletingTruckId] = useState(null);
@@ -141,7 +142,7 @@ const EditableTable = () => {
             const values = await form.validateFields();
             console.log('Success:', values);
             setIsLoading(true);
-            axios.post(api + `/trucks`, values)
+            axios.post(api+`/trucks`, values)
                 .then(response => {
                     console.log(response.data);
                     setIsModalOpen(false);
@@ -442,16 +443,6 @@ const EditableTable = () => {
                             rules={editingTruck ? [] : [{ required: true, message: 'Please enter city, state, zipcode!' }]}
                         >
                             <Input key="cityStateZip" />
-                        </Form.Item>
-
-                        <Form.Item
-                            name="Destination"
-                            label="Destination"
-                            style={{ width: '29%' }}
-                            rules={editingTruck ? [] : [{ required: true, message: 'Please enter Destination city, state, zipcode!' }]}
-
-                        >
-                            <Input key="Destination" disabled={editingTruck} />
                         </Form.Item>
 
                         <Form.Item
