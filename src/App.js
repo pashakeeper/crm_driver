@@ -1,8 +1,11 @@
-import React, {useState, useEffect} from 'react';
-import {Layout, Menu, Button, Form, Input, message} from 'antd';
+import React, { useState, useEffect } from 'react';
+ // eslint-disable-next-line
+import { Layout, Menu, Button, Form, Input, message, Modal, Row } from 'antd';
 import {
     UserOutlined,
+     // eslint-disable-next-line
     VideoCameraOutlined,
+     // eslint-disable-next-line
     UploadOutlined,
     MenuUnfoldOutlined,
     MenuFoldOutlined
@@ -10,43 +13,125 @@ import {
 import EditableTable from './components/Table';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./style.scss";
-const LoginForm = ({onFinish}) => {
+import axios from 'axios'; 
+import api from './components/Api';
+
+const RegistrationForm = ({ onFinish }) => {
     const [form] = Form.useForm();
 
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
     };
 
+    const handleRegistration = async (values) => {
+        try {
+            const response = await axios.post(api + '/register', values);
+            message.success(response.data.message);
+            onFinish();
+        } catch (error) {
+            message.error(error.response.data.error);
+        }
+    };
+
     return (
         <Form
             form={form}
-            name="loginForm"
-            onFinish={onFinish}
+            name="registrationForm"
+            onFinish={handleRegistration}
             onFinishFailed={onFinishFailed}
         >
             <Form.Item
                 name="username"
-                rules={[{required: true, message: 'Please input your username!'}]}
+                rules={[{ required: true, message: 'Please input your username!' }]}
             >
-                <Input prefix={<UserOutlined/>} placeholder="Username"/>
+                <Input prefix={<UserOutlined />} placeholder="Username" />
             </Form.Item>
 
             <Form.Item
                 name="password"
-                rules={[{required: true, message: 'Please input your password!'}]}
+                rules={[{ required: true, message: 'Please input your password!' }]}
             >
-                <Input.Password prefix={<UserOutlined/>} placeholder="Password"/>
+                <Input.Password prefix={<UserOutlined />} placeholder="Password" />
             </Form.Item>
 
             <Form.Item>
-                <Button className="mx-lg-auto d-flex" type="primary" htmlType="submit">Log in</Button>
+                <Button className="mx-lg-auto d-flex" type="primary" htmlType="submit">Register</Button>
             </Form.Item>
         </Form>
     );
 };
 
+const LoginForm = ({ onFinish }) => {
+    const [form] = Form.useForm();
+    const [modalVisible, setModalVisible] = useState(false);
+
+    const onFinishFailed = (errorInfo) => {
+        console.log('Failed:', errorInfo);
+    };
+
+    const handleLogin = async (values) => {
+        try {
+            // eslint-disable-next-line
+            const response = await axios.post(api + '/login', values);
+            localStorage.setItem('isLoggedIn', 'true');
+            onFinish();
+        } catch (error) {
+            message.error(error.response.data.error);
+        }
+    };
+
+    const openRegistrationModal = () => {
+        setModalVisible(true);
+    };
+
+    const closeRegistrationModal = () => {
+        setModalVisible(false);
+    };
+
+    return (
+        <>
+            <Form
+                form={form}
+                name="loginForm"
+                onFinish={handleLogin}
+                onFinishFailed={onFinishFailed}
+            >
+                <Form.Item
+                    name="username"
+                    rules={[{ required: true, message: 'Please input your username!' }]}
+                >
+                    <Input prefix={<UserOutlined />} placeholder="Username" />
+                </Form.Item>
+
+                <Form.Item
+                    name="password"
+                    rules={[{ required: true, message: 'Please input your password!' }]}
+                >
+                    <Input.Password prefix={<UserOutlined />} placeholder="Password" />
+                </Form.Item>
+                <Row justify='space-between'>
+                <Form.Item>
+                    <Button className="mx-lg-auto d-flex" type="primary" htmlType="submit">Log in</Button>
+                </Form.Item>
+                <Form.Item>
+                    <Button className="mx-lg-auto d-flex" type="default" onClick={openRegistrationModal}>Register</Button>
+                </Form.Item>
+                </Row>
+            </Form>
+            <Modal
+                title="Registration"
+                open={modalVisible}
+                onCancel={closeRegistrationModal}
+                footer={null}
+            >
+                <RegistrationForm onFinish={closeRegistrationModal} />
+            </Modal>
+        </>
+    );
+};
+
 function App() {
-    const {Header, Sider, Content} = Layout;
+    const { Header, Sider, Content } = Layout;
     const [collapsed, setCollapsed] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -56,15 +141,6 @@ function App() {
             setIsLoggedIn(true);
         }
     }, []);
-
-    const handleLogin = ({username, password}) => {
-        if (username === 'admin' && password === 'admin') {
-            setIsLoggedIn(true);
-            localStorage.setItem('isLoggedIn', 'true');
-        } else {
-            message.error('Неверные учетные данные!');
-        }
-    };
 
     const handleLogout = () => {
         setIsLoggedIn(false);
@@ -76,57 +152,57 @@ function App() {
             {!isLoggedIn ? (
                 <div className="container h-100">
                     <div className="row h-100 align-items-center">
-                        <div style={{padding: '20px'}} className="col-lg-4 mx-lg-auto">
+                        <div style={{ padding: '20px' }} className="col-lg-4 mx-lg-auto">
                             <h1 className="text-center">Admin Form</h1>
-                            <LoginForm onFinish={handleLogin}/>
+                            <LoginForm onFinish={() => setIsLoggedIn(true)} />
                         </div>
                     </div>
                 </div>
             ) : (
-                // Ako je korisnik prijavljen, prikazuje se glavna stranica
-                <Layout>
-                    <Sider trigger={null} collapsible collapsed={!collapsed}>
-                        <div className="demo-logo-vertical"/>
-                        <Menu
-                            theme="dark"
-                            className='main_menu'
-                            mode="inline"
-                            defaultSelectedKeys={['1']}
-                            items={[
-                                {
-                                    key: '1',
-                                    icon: <UserOutlined/>,
-                                    label: 'nav 1',
-                                },
-                                {
-                                    key: '2',
-                                    icon: <VideoCameraOutlined/>,
-                                    label: 'nav 2',
-                                },
-                                {
-                                    key: '3',
-                                    icon: <UploadOutlined/>,
-                                    label: 'nav 3',
-                                },
-                            ]}
-                        />
-                    </Sider>
-                    <Layout className='layout_cust'>
-                        <Header className="app-header d-flex align-items-center justify-content-between">
-                            <Button
-                                className='trigger'
-                                type="text"
-                                icon={collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>}
-                                onClick={() => setCollapsed(!collapsed)}
-                            />
-                            <Button type="primary" className="logout" onClick={handleLogout}>Logout</Button>
-                        </Header>
-                        <Content className="app-content">
-                            <EditableTable/>
-                        </Content>
+                    // Ako je korisnik prijavljen, prikazuje se glavna stranica
+                    <Layout>
+                        <Sider trigger={null} collapsible collapsed={!collapsed}>
+                            <div className="demo-logo-vertical" />
+                            {/* <Menu
+                                theme="dark"
+                                className='main_menu'
+                                mode="inline"
+                                defaultSelectedKeys={['1']}
+                                items={[
+                                    {
+                                        key: '1',
+                                        icon: <UserOutlined />,
+                                        label: 'nav 1',
+                                    },
+                                    {
+                                        key: '2',
+                                        icon: <VideoCameraOutlined />,
+                                        label: 'nav 2',
+                                    },
+                                    {
+                                        key: '3',
+                                        icon: <UploadOutlined />,
+                                        label: 'nav 3',
+                                    },
+                                ]}
+                            /> */}
+                        </Sider>
+                        <Layout className='layout_cust'>
+                            <Header className="app-header d-flex align-items-center justify-content-between">
+                                <Button
+                                    className='trigger'
+                                    type="text"
+                                    icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                                    onClick={() => setCollapsed(!collapsed)}
+                                />
+                                <Button type="primary" className="logout" onClick={handleLogout}>Logout</Button>
+                            </Header>
+                            <Content className="app-content">
+                                <EditableTable />
+                            </Content>
+                        </Layout>
                     </Layout>
-                </Layout>
-            )}
+                )}
         </Layout>
     );
 }

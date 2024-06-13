@@ -95,11 +95,9 @@ const EditableTable = () => {
     };
     const calculateDistance = async (origin, destination) => {
         try {
-            // Преобразуем адреса в координаты
             const originCoordinates = await geocodeAddress(origin);
             const destinationCoordinates = await geocodeAddress(destination);
 
-            // Если координаты успешно получены, вычисляем расстояние
             if (originCoordinates && destinationCoordinates) {
                 const response = await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${originCoordinates[0]},${originCoordinates[1]};${destinationCoordinates[0]},${destinationCoordinates[1]}?access_token=pk.eyJ1Ijoia2VlcGVycGFzaGEiLCJhIjoiY2x2YmY3YjBpMDh0MDJqcDFtNDZ0eWgyZSJ9.TUeu9hzNn-mEpHQH7t3BEg`);
                 const distance = response.data.routes[0].distance / 1609.34;
@@ -121,7 +119,6 @@ const EditableTable = () => {
                 axios.put(api + `/trucks/${editingTruck.ID}`, values)
                     .then(response => {
                         console.log(response.data);
-                        // Обновляем значение дестинейшена для всех водителей
                         setIsModalOpen(false);
                         setIsLoading(false);
                         setEditingTruck(null);
@@ -140,16 +137,14 @@ const EditableTable = () => {
     const handleCreate = async () => {
         try {
             const values = await form.validateFields();
-            console.log('Success:', values);
             setIsLoading(true);
-            axios.post(api+`/trucks`, values)
+            axios.post(api + '/trucks', values)
                 .then(response => {
                     console.log(response.data);
                     setIsModalOpen(false);
                     setIsLoading(false);
-                    setNewTruck({});
                     form.resetFields();
-                    fetchData();
+                    fetchData(); // Обновляем данные после создания новой записи
                 })
                 .catch(error => {
                     console.error('There was an error!', error);
@@ -159,6 +154,7 @@ const EditableTable = () => {
             console.log('Failed:', errorInfo);
         }
     }
+
     const showDeleteModal = (id) => {
         setDeletingTruckId(id);
         setIsDeleteModalVisible(true);
@@ -178,18 +174,6 @@ const EditableTable = () => {
         fetchData();
 
     }, [destinationValue]);
-    // useEffect(() => {
-    //     fetchData();
-
-    // }, [destinationValue, currentPage, pageSize]);
-    // const handlePageChange = (page, pageSize) => {
-    //     setCurrentPage(page);
-    // };
-
-    // const handlePageSizeChange = (current, size) => {
-    //     setPageSize(size);
-    //     setCurrentPage(1);
-    // };
 
     const handleDelete = async (id) => {
         try {
@@ -245,7 +229,7 @@ const EditableTable = () => {
             title: 'When will be there',
             dataIndex: 'whenWillBeThere',
             key: 'When',
-            width: '180px',
+            width: '100px',
             render: (text, record) => {
                 const date = record.WhenWillBeThere;
                 const formattedDate = moment(date).format('YYYY-MM-DD HH:mm:ss')
@@ -268,6 +252,15 @@ const EditableTable = () => {
             width: '120px',
             render: (text, record) => (
                 <p key={record.ID}>{record.CellPhone}</p>
+            )
+        },
+        {
+            title: 'E-mail',
+            dataIndex: 'mail',
+            key: 'Mail',
+            width: '150px',
+            render: (text, record) => (
+                <p key={record.ID}>{record.mail}</p>
             )
         },
         {
@@ -362,10 +355,10 @@ const EditableTable = () => {
                 <Form form={form} layout="vertical" name="form_in_modal" initialValues={{ remember: true }}>
                     <Row className='form_row'>
                         <Form.Item
-                            name="truckNumber"
+                            name="TruckNumber"
                             label="Truck Number"
                             style={{ width: '29%' }}
-                            rules={editingTruck ? [] : [{ required: true, message: 'Please enter truck number!' }]}
+                        // rules={editingTruck ? [] : [{ required: true, message: 'Please enter truck number!' }]}
                         >
                             <Input key="truckNumber" />
                         </Form.Item>
@@ -373,7 +366,7 @@ const EditableTable = () => {
                             name="status"
                             label="Status"
                             style={{ width: '29%' }}
-                            rules={editingTruck ? [] : [{ required: true, message: 'Please choose status!' }]}
+                        // rules={editingTruck ? [] : [{ required: true, message: 'Please choose status!' }]}
                         >
                             <Select
                                 key="status"
@@ -390,7 +383,7 @@ const EditableTable = () => {
                             name="whenWillBeThere"
                             label="When Will Be There"
                             style={{ width: '29%' }}
-                            rules={editingTruck ? [] : [{ required: true, message: 'Please choose date!' }]}
+                        // rules={editingTruck ? [] : [{ required: true, message: 'Please choose date!' }]}
                         >
                             <Space direction="horizontal" className='date_space'>
                                 <DatePicker
@@ -416,20 +409,27 @@ const EditableTable = () => {
                             name="driverName"
                             label="Driver name"
                             style={{ width: '29%' }}
-                            rules={editingTruck ? [] : [{ required: true, message: 'Please enter driver name!' }]}
+                        // rules={editingTruck ? [] : [{ required: true, message: 'Please enter driver name!' }]}
                         >
                             <Input key="driverName" />
                         </Form.Item>
-
+                        <Form.Item
+                            name="mail"
+                            label="E-mail"
+                            style={{ width: '29%' }}
+                        // rules={editingTruck ? [] : [{ required: true, message: 'Please enter driver name!' }]}
+                        >
+                            <Input key="driverName" />
+                        </Form.Item>
                         <Form.Item
                             name="cellPhone"
                             label="Phone Number"
                             style={{ width: '29%' }}
-                            rules={editingTruck ? [] : [{ required: true, message: 'Please enter phone number!' }]}
+                        // rules={editingTruck ? [] : [{ required: true, message: 'Please enter phone number!' }]}
                         >
                             <InputMask
                                 key="cellPhone"
-                                mask={'999-999-999'}
+                                mask={'999-999-9999'}
                                 autoComplete="off"
                                 className='ant-input css-dev-only-do-not-override-11xg00t ant-input-outlined'
                             >
@@ -440,7 +440,7 @@ const EditableTable = () => {
                             name="cityStateZip"
                             label="City, State zipCode"
                             style={{ width: '29%' }}
-                            rules={editingTruck ? [] : [{ required: true, message: 'Please enter city, state, zipcode!' }]}
+                        // rules={editingTruck ? [] : [{ required: true, message: 'Please enter city, state, zipcode!' }]}
                         >
                             <Input key="cityStateZip" />
                         </Form.Item>
@@ -449,7 +449,7 @@ const EditableTable = () => {
                             name="dimensions"
                             label="Dimensions/Payload"
                             style={{ width: '29%' }}
-                            rules={editingTruck ? [] : [{ required: true, message: 'Please enter Dimensions/Payload!' }]}
+                        // rules={editingTruck ? [] : [{ required: true, message: 'Please enter Dimensions/Payload!' }]}
                         >
                             <Input key="dimensions" />
                         </Form.Item>
@@ -457,7 +457,7 @@ const EditableTable = () => {
                             name="holdTime"
                             label="Hold By Dispetcher"
                             style={{ width: '29%' }}
-                            rules={editingTruck ? [] : []}
+                        // rules={editingTruck ? [] : []}
                         >
                             <Input key="holdTime" />
                         </Form.Item>
@@ -465,7 +465,7 @@ const EditableTable = () => {
                             name="rate"
                             label="Loads/Mark"
                             style={{ width: '29%' }}
-                            rules={editingTruck ? [] : [{ required: true, message: 'Please enter rating (0-5)!' }]}
+                        // rules={editingTruck ? [] : [{ required: true, message: 'Please enter rating (0-5)!' }]}
                         >
                             <Input key="holdTime" />
                         </Form.Item>
