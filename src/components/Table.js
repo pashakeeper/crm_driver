@@ -211,7 +211,7 @@ const EditableTable = () => {
             width: '140px',
             sorter: (a, b) => a.rate - b.rate,
             render: (text, record) => (
-                <Tag color="geekblue">
+                <Tag color="geekblue" >
                     {record.rate.toUpperCase()}
                 </Tag>
             )
@@ -222,7 +222,7 @@ const EditableTable = () => {
             key: 'Status',
             sorter: (a, b) => a.Status.localeCompare(b.Status),
             render: (text, record) => (
-                <StatusTag status={record.Status}></StatusTag>
+                <StatusTag  status={record.Status}></StatusTag>
             )
         },
         {
@@ -371,11 +371,14 @@ const EditableTable = () => {
                             <Select
                                 key="status"
                                 defaultValue={'Chose status for truck'}
-                                style={{ width: '100%' }}
+                                style={{ width: '100%',height: '100px' }}
                                 options={[
                                     { value: 'Available', label: 'Available' },
                                     { value: 'Unavailable', label: 'Unavailable' },
                                     { value: 'On hold', label: 'On hold' },
+                                    { value: 'Manual', label: 'Manual' },
+                                    { value: 'Out of service', label: 'Out of service' },
+                                    { value: 'Available on', label: 'Available on' },
                                 ]}
                             />
                         </Form.Item>
