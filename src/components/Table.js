@@ -335,15 +335,15 @@ const EditableTable = () => {
                 </Modal>
             </Row>
             <TableSearch onSearch={handleSearch} />
-            <Table dataSource={filteredTrucks} columns={columns} rowKey={record => record.ID} loading={isLoading} className='main_table' pagination={{
-                // current: currentPage,
-                // pageSize: pageSize,
-                pageSize: 55,
-                // total: trucks.length,
-                // showSizeChanger: true,
-                // onChange: handlePageChange,
-                // onShowSizeChange: handlePageSizeChange 
-            }} />
+            <Table
+                dataSource={filteredTrucks}
+                columns={columns}
+                rowKey={record => record.ID}
+                loading={isLoading}
+                className='main_table'
+                pagination={false}
+            />
+
             <Modal width={'70%'} title="Edit table Data" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={[
                 <Button key="back" onClick={handleCancel}>
                     Cancel
@@ -389,20 +389,22 @@ const EditableTable = () => {
                                 <DatePicker
                                     key="whenWillBeThere"
                                     style={{ width: '100%' }}
-                                    showTime
+                                    showTime={{ format: 'HH:mm' }}
+                                    format="YYYY-MM-DD HH:mm"
                                     onChange={(value, dateString) => {
                                         console.log('Selected Time: ', value);
                                         console.log('Formatted Selected Time: ', dateString);
-                                        const formattedDate = value.format('YYYY-MM-DD HH:mm:ss');
+                                        const formattedDate = value.format('YYYY-MM-DD HH:mm');
                                         form.setFieldsValue({ whenWillBeThere: formattedDate });
                                         console.log('Selected Time on Ok: ', formattedDate);
                                     }}
                                     onOk={(value) => {
-                                        const formattedDate = value.format('YYYY-MM-DD HH:mm:ss');
+                                        const formattedDate = value.format('YYYY-MM-DD HH:mm');
                                         form.setFieldsValue({ whenWillBeThere: formattedDate });
                                         console.log('Selected Time on Ok: ', formattedDate);
                                     }}
                                 />
+
                             </Space>
                         </Form.Item>
                         <Form.Item
@@ -429,9 +431,9 @@ const EditableTable = () => {
                         >
                             <InputMask
                                 key="cellPhone"
-                                mask={'999-999-9999'}
+                                mask={'(999) 999-9999'}
                                 autoComplete="off"
-                                className='ant-input css-dev-only-do-not-override-11xg00t ant-input-outlined'
+                                className='mask'
                             >
                             </InputMask>
                         </Form.Item>
