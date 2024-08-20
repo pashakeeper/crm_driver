@@ -16,13 +16,17 @@ const StatusTag = ({ status }) => {
             color = '#0000FF'; // Синий цвет для статуса "On Hold"
             break;
         case 'Available on':
-            color = '#FFFF00'; // Желтый цвет для статуса "Available on"
+            color = '#070707'; // Желтый цвет для статуса "Available on"
             break;
         case 'Manual':
             color = '#800080'; // Фиолетовый цвет для статуса "Manual"
             break;
         case 'Out of service':
             color = '#FFA500'; // Рыжий цвет для статуса "Out of service"
+            break;
+        case 'Updated':
+            color = '#00ffb7';
+            style = {color: '#000', padding: '20px' }; // Рыжий цвет для статуса "Out of service"
             break;
         default:
             color = '#d9d9d9'; // Цвет по умолчанию для других статусов (серый)

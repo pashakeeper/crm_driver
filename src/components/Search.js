@@ -7,15 +7,17 @@ const TableSearch = ({ onSearch }) => {
     const [status, setStatus] = useState('');
     const [name, setName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [contactphoneNumber, setcontactPhoneNumber] = useState('');
     const handleReset = () => {
         setTruckNumber('');
         setStatus('');
         setName('');
         setPhoneNumber('');
-        onSearch({ truckNumber: '', status: '', name: '', phoneNumber: '' });
+        setcontactPhoneNumber('');
+        onSearch({ truckNumber: '', status: '', name: '', phoneNumber: '', contactphoneNumber: '' });
     };
     const handleSearch = () => {
-        onSearch({ truckNumber, status, name, phoneNumber });
+        onSearch({ truckNumber, status, name, phoneNumber, contactphoneNumber });
     };
 
     const handleTruckNumberChange = (e) => {
@@ -30,6 +32,10 @@ const TableSearch = ({ onSearch }) => {
     };
     const handlePhoneNumberChange = (e) => {
         setPhoneNumber(e.target.value);
+    };
+
+    const handlecontactPhoneNumberChange = (e) => {
+        setcontactPhoneNumber(e.target.value);
     };
 
 return (
@@ -50,6 +56,12 @@ return (
             placeholder="Search Name"
             value={name}
             onChange={handleNameChange}
+            style={{ width: 200 }}
+        />
+        <Input
+            placeholder="Search Contact Phone number"
+            value={contactphoneNumber}
+            onChange={handlecontactPhoneNumberChange}
             style={{ width: 200 }}
         />
         <Input

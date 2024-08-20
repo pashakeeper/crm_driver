@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Row, Form, Input, Modal, Select, DatePicker, Space, Tag } from 'antd';
+import { Table, Button, Row, Form, Input, Modal, Select, DatePicker, Space, Tag, Tooltip } from 'antd';
+import {SkinFilled} from '@ant-design/icons';
 import InputMask from "react-input-mask";
 import { EditOutlined, SaveOutlined, DeleteOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import moment from 'moment';
 import TableSearch from './Search';
 import StatusTag from './Tag';
 import api from './Api';
@@ -20,6 +20,13 @@ const EditableTable = () => {
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const [deletingTruckId, setDeletingTruckId] = useState(null);
     const [destinationValue, setDestinationValue] = useState('');
+    const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+    const [currentComment, setCurrentComment] = useState('');
+    const { TextArea } = Input;
+
+    const textTool = "To open comment CLICK!"
+
+
 
     // const [currentPage, setCurrentPage] = useState(1);
     // const [pageSize, setPageSize] = useState(55);
@@ -46,6 +53,7 @@ const EditableTable = () => {
             }));
             setTrucks(trucksWithCoordinates);
             setIsLoading(false);
+
         } catch (error) {
             console.error('Error fetching data:', error);
             setIsLoading(false);
@@ -67,19 +75,20 @@ const EditableTable = () => {
             setTrucks(prevTrucks => prevTrucks.map(prevTruck => prevTruck.ID === updatedTruck.ID ? updatedTruck : prevTruck));
         });
     };
-    const handleSearch = ({ truckNumber, status, name, phoneNumber }) => {
-        setFilterValue({ truckNumber, status, name, phoneNumber });
+    const handleSearch = ({ truckNumber, status, name, phoneNumber, contactphoneNumber }) => {
+        setFilterValue({ truckNumber, status, name, phoneNumber, contactphoneNumber });
     };
     const filteredTrucks = trucks.filter(truck => {
         const truckNumberMatch = !filterValue.truckNumber || truck.TruckNumber.toLowerCase().includes(filterValue.truckNumber.toLowerCase());
         const statusMatch = !filterValue.status || truck.Status.toLowerCase().includes(filterValue.status.toLowerCase());
         const nameMatch = !filterValue.name || truck.DriverName.toLowerCase().includes(filterValue.name.toLowerCase());
         const phoneNumberMatch = !filterValue.phoneNumber || truck.CellPhone.toLowerCase().includes(filterValue.phoneNumber.toLowerCase());
-        return truckNumberMatch && statusMatch && nameMatch && phoneNumberMatch;
+        const contactphoneNumberMatch = !filterValue.contactphoneNumber || truck.contactphone.toLowerCase().includes(filterValue.contactphoneNumber.toLowerCase());
+        return truckNumberMatch && statusMatch && nameMatch && phoneNumberMatch && contactphoneNumberMatch;
     });
     const geocodeAddress = async (address) => {
         try {
-            const response = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=pk.eyJ1Ijoia2VlcGVycGFzaGEiLCJhIjoiY2x2YmY3YjBpMDh0MDJqcDFtNDZ0eWgyZSJ9.TUeu9hzNn-mEpHQH7t3BEg`);
+            const response = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=pk.eyJ1IjoiY29ubmVjdDEwMDUwMCIsImEiOiJjbHo4aHVmaHgwMTVtMm5xeW1uNWp5dWo1In0.FmATHzAdINyxJwRyglqxlA`);
             const features = response.data.features;
             if (features.length > 0) {
                 const coordinates = features[0].center;
@@ -99,7 +108,7 @@ const EditableTable = () => {
             const destinationCoordinates = await geocodeAddress(destination);
 
             if (originCoordinates && destinationCoordinates) {
-                const response = await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${originCoordinates[0]},${originCoordinates[1]};${destinationCoordinates[0]},${destinationCoordinates[1]}?access_token=pk.eyJ1Ijoia2VlcGVycGFzaGEiLCJhIjoiY2x2YmY3YjBpMDh0MDJqcDFtNDZ0eWgyZSJ9.TUeu9hzNn-mEpHQH7t3BEg`);
+                const response = await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${originCoordinates[0]},${originCoordinates[1]};${destinationCoordinates[0]},${destinationCoordinates[1]}?access_token=pk.eyJ1IjoiY29ubmVjdDEwMDUwMCIsImEiOiJjbHo4aHVmaHgwMTVtMm5xeW1uNWp5dWo1In0.FmATHzAdINyxJwRyglqxlA`);
                 const distance = response.data.routes[0].distance / 1609.34;
                 return distance;
             } else {
@@ -114,9 +123,13 @@ const EditableTable = () => {
         try {
             const values = await form.validateFields();
             console.log('Success:', values);
+            const updatedValues = {
+                ...values,
+                isActive: false,
+            };
             if (editingTruck) {
                 setIsLoading(true);
-                axios.put(api + `/trucks/${editingTruck.ID}`, values)
+                axios.put(api + `/trucks/${editingTruck.ID}`, updatedValues)
                     .then(response => {
                         console.log(response.data);
                         setIsModalOpen(false);
@@ -193,6 +206,11 @@ const EditableTable = () => {
         }
     }
 
+    const handleCommentClick = (comment) => {
+        setCurrentComment(comment);
+        setIsCommentModalOpen(true);
+    };
+
     const columns = [
         {
             title: 'Truck №',
@@ -208,12 +226,15 @@ const EditableTable = () => {
             title: 'Loads/Mark',
             dataIndex: 'rate',
             key: 'rate',
-            width: '140px',
+            width: '120px',
             sorter: (a, b) => a.rate - b.rate,
             render: (text, record) => (
-                <Tag color="geekblue" >
-                    {record.rate.toUpperCase()}
-                </Tag>
+                <>
+                    <Tag color="geekblue" style={{ marginRight: '0' }} >
+                        {record.rate.toUpperCase()}
+                    </Tag>
+                    {record.isActive ? <div className='driver_update'><SkinFilled style={{ color: '#fff', fontSize: '9px' }} /></div> : ''}
+                </>
             )
         },
         {
@@ -222,17 +243,22 @@ const EditableTable = () => {
             key: 'Status',
             sorter: (a, b) => a.Status.localeCompare(b.Status),
             render: (text, record) => (
-                <StatusTag  status={record.Status}></StatusTag>
+                <StatusTag status={record.Status}></StatusTag>
             )
         },
         {
             title: 'When will be there',
             dataIndex: 'whenWillBeThere',
             key: 'When',
-            width: '100px',
+            width: '170px',
+            className: 'time',
             render: (text, record) => {
-                const date = record.WhenWillBeThere;
-                const formattedDate = moment(date).format('YYYY-MM-DD HH:mm:ss')
+                const date = new Date(record.WhenWillBeThere);
+                const formattedDate = date.getFullYear() + '-' +
+                    ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+                    ('0' + date.getDate()).slice(-2) + ' ' +
+                    ('0' + date.getHours()).slice(-2) + ':' +
+                    ('0' + date.getMinutes()).slice(-2);
                 return <p key={record.ID}>{formattedDate}</p>;
             }
         },
@@ -243,6 +269,15 @@ const EditableTable = () => {
             sorter: (a, b) => a.DriverName.localeCompare(b.DriverName),
             render: (text, record) => (
                 <p key={record.ID}>{record.DriverName}</p>
+            )
+        },
+        {
+            title: 'Contact phone',
+            dataIndex: 'contactphone',
+            key: 'contactphone',
+            width: '150px',
+            render: (text, record) => (
+                <p key={record.ID}>{record.contactphone}</p>
             )
         },
         {
@@ -300,6 +335,19 @@ const EditableTable = () => {
             )
         },
         {
+            title: 'Comment',
+            dataIndex: 'Comment',
+            key: 'Comment',
+            render: (text, record) => (
+                <div className='comment' onClick={() => handleCommentClick(record.comments)} style={{ cursor: 'pointer', color: 'blue' }}>
+                    <Tooltip placement="top" title={textTool}>
+                        {record.comments}
+                    </Tooltip>
+
+                </div>
+            )
+        },
+        {
             title: '#',
             dataIndex: 'actions',
             key: 'Actions',
@@ -333,6 +381,19 @@ const EditableTable = () => {
                 >
                     <p>Are you sure you want to delete this driver?</p>
                 </Modal>
+                <Modal
+                    title="Comment"
+                    open={isCommentModalOpen}
+                    onOk={() => setIsCommentModalOpen(false)}
+                    onCancel={() => setIsCommentModalOpen(false)}
+                    footer={[
+                        <Button key="close" onClick={() => setIsCommentModalOpen(false)}>
+                            Close
+                        </Button>
+                    ]}
+                >
+                    <p>{currentComment}</p>
+                </Modal>
             </Row>
             <TableSearch onSearch={handleSearch} />
             <Table
@@ -341,7 +402,7 @@ const EditableTable = () => {
                 rowKey={record => record.ID}
                 loading={isLoading}
                 className='main_table'
-                pagination={false}
+                pagination={{ pageSize: 55 }}
             />
 
             <Modal width={'70%'} title="Edit table Data" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={[
@@ -371,7 +432,7 @@ const EditableTable = () => {
                             <Select
                                 key="status"
                                 defaultValue={'Chose status for truck'}
-                                style={{ width: '100%',height: '100px' }}
+                                style={{ width: '100%' }}
                                 options={[
                                     { value: 'Available', label: 'Available' },
                                     { value: 'Unavailable', label: 'Unavailable' },
@@ -379,6 +440,7 @@ const EditableTable = () => {
                                     { value: 'Manual', label: 'Manual' },
                                     { value: 'Out of service', label: 'Out of service' },
                                     { value: 'Available on', label: 'Available on' },
+                                    { value: 'Updated', label: 'Updated' },
                                 ]}
                             />
                         </Form.Item>
@@ -388,6 +450,7 @@ const EditableTable = () => {
                             style={{ width: '29%' }}
                         // rules={editingTruck ? [] : [{ required: true, message: 'Please choose date!' }]}
                         >
+
                             <Space direction="horizontal" className='date_space'>
                                 <DatePicker
                                     key="whenWillBeThere"
@@ -397,9 +460,8 @@ const EditableTable = () => {
                                     onChange={(value, dateString) => {
                                         console.log('Selected Time: ', value);
                                         console.log('Formatted Selected Time: ', dateString);
-                                        const formattedDate = value.format('YYYY-MM-DD HH:mm');
-                                        form.setFieldsValue({ whenWillBeThere: formattedDate });
-                                        console.log('Selected Time on Ok: ', formattedDate);
+                                        form.setFieldsValue({ whenWillBeThere: dateString });
+                                        console.log('Selected Time on Ok: ', dateString);
                                     }}
                                     onOk={(value) => {
                                         const formattedDate = value.format('YYYY-MM-DD HH:mm');
@@ -434,6 +496,20 @@ const EditableTable = () => {
                         >
                             <InputMask
                                 key="cellPhone"
+                                mask={'999-999-9999'}
+                                autoComplete="off"
+                                className='mask'
+                            >
+                            </InputMask>
+                        </Form.Item>
+                        <Form.Item
+                            name="contactphone"
+                            label="Contact Phone Number"
+                            style={{ width: '29%' }}
+                        // rules={editingTruck ? [] : [{ required: true, message: 'Please enter phone number!' }]}
+                        >
+                            <InputMask
+                                key="cellPhone"
                                 mask={'(999) 999-9999'}
                                 autoComplete="off"
                                 className='mask'
@@ -445,6 +521,7 @@ const EditableTable = () => {
                             name="cityStateZip"
                             label="City, State zipCode"
                             style={{ width: '29%' }}
+                            autoComplete="off"
                         // rules={editingTruck ? [] : [{ required: true, message: 'Please enter city, state, zipcode!' }]}
                         >
                             <Input key="cityStateZip" />
@@ -473,6 +550,14 @@ const EditableTable = () => {
                         // rules={editingTruck ? [] : [{ required: true, message: 'Please enter rating (0-5)!' }]}
                         >
                             <Input key="holdTime" />
+                        </Form.Item>
+                        <Form.Item
+                            name="comments"
+                            label="Comments"
+                            style={{ width: '40%' }}
+                        // rules={editingTruck ? [] : [{ required: true, message: 'Please enter truck number!' }]}
+                        >
+                            <TextArea rows={4} placeholder="Comments" />
                         </Form.Item>
                     </Row>
                 </Form>

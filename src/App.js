@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from 'react';
  // eslint-disable-next-line
-import { Layout, Menu, Button, Form, Input, message, Modal, Row } from 'antd';
+import { Layout, Button, Form, Input, message, Modal, Row } from 'antd';
 import {
-    UserOutlined,
-     // eslint-disable-next-line
-    VideoCameraOutlined,
-     // eslint-disable-next-line
-    UploadOutlined,
-    MenuUnfoldOutlined,
-    MenuFoldOutlined
+    UserOutlined
 } from '@ant-design/icons';
 import EditableTable from './components/Table';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -131,8 +125,7 @@ const LoginForm = ({ onFinish }) => {
 };
 
 function App() {
-    const { Header, Sider, Content } = Layout;
-    const [collapsed, setCollapsed] = useState(false);
+    const { Header, Content } = Layout;
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
@@ -161,40 +154,8 @@ function App() {
             ) : (
                     // Ako je korisnik prijavljen, prikazuje se glavna stranica
                     <Layout>
-                        <Sider trigger={null} collapsible collapsed={!collapsed}>
-                            <div className="demo-logo-vertical" />
-                            {/* <Menu
-                                theme="dark"
-                                className='main_menu'
-                                mode="inline"
-                                defaultSelectedKeys={['1']}
-                                items={[
-                                    {
-                                        key: '1',
-                                        icon: <UserOutlined />,
-                                        label: 'nav 1',
-                                    },
-                                    {
-                                        key: '2',
-                                        icon: <VideoCameraOutlined />,
-                                        label: 'nav 2',
-                                    },
-                                    {
-                                        key: '3',
-                                        icon: <UploadOutlined />,
-                                        label: 'nav 3',
-                                    },
-                                ]}
-                            /> */}
-                        </Sider>
                         <Layout className='layout_cust'>
                             <Header className="app-header d-flex align-items-center justify-content-between">
-                                <Button
-                                    className='trigger'
-                                    type="text"
-                                    icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                                    onClick={() => setCollapsed(!collapsed)}
-                                />
                                 <Button type="primary" className="logout" onClick={handleLogout}>Logout</Button>
                             </Header>
                             <Content className="app-content">
