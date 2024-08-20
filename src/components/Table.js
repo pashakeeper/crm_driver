@@ -75,16 +75,17 @@ const EditableTable = () => {
             setTrucks(prevTrucks => prevTrucks.map(prevTruck => prevTruck.ID === updatedTruck.ID ? updatedTruck : prevTruck));
         });
     };
-    const handleSearch = ({ truckNumber, status, name, phoneNumber, contactphoneNumber }) => {
-        setFilterValue({ truckNumber, status, name, phoneNumber, contactphoneNumber });
+    const handleSearch = ({ truckNumber, status, name, phoneNumber }) => {
+        setFilterValue({ truckNumber, status, name, phoneNumber });
     };
     const filteredTrucks = trucks.filter(truck => {
         const truckNumberMatch = !filterValue.truckNumber || truck.TruckNumber.toLowerCase().includes(filterValue.truckNumber.toLowerCase());
         const statusMatch = !filterValue.status || truck.Status.toLowerCase().includes(filterValue.status.toLowerCase());
         const nameMatch = !filterValue.name || truck.DriverName.toLowerCase().includes(filterValue.name.toLowerCase());
-        const phoneNumberMatch = !filterValue.phoneNumber || truck.CellPhone.toLowerCase().includes(filterValue.phoneNumber.toLowerCase());
-        const contactphoneNumberMatch = !filterValue.contactphoneNumber || truck.contactphone.toLowerCase().includes(filterValue.contactphoneNumber.toLowerCase());
-        return truckNumberMatch && statusMatch && nameMatch && phoneNumberMatch && contactphoneNumberMatch;
+        const phoneNumberMatch = !filterValue.phoneNumber || 
+            truck.CellPhone.toLowerCase().includes(filterValue.phoneNumber.toLowerCase()) || 
+            truck.contactphone.toLowerCase().includes(filterValue.phoneNumber.toLowerCase());
+        return truckNumberMatch && statusMatch && nameMatch && phoneNumberMatch;
     });
     const geocodeAddress = async (address) => {
         try {
