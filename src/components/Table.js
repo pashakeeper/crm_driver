@@ -39,7 +39,6 @@ const EditableTable = () => {
     useEffect(() => {
 
         const storedDestination = localStorage.getItem('destination');
-        console.log(storedDestination);
         if (storedDestination) {
             setDestinationValue(storedDestination);
         }
@@ -60,23 +59,6 @@ const EditableTable = () => {
             setIsLoading(false);
         }
     };
-    // const handleDestinationChange = (value) => {
-    //     localStorage.setItem('destination', value);
-    //     setDestinationValue(value);
-    //     const updatedTrucks = trucks.map(truck => {
-    //         return {
-    //             ...truck,
-    //             Destination: value
-    //         };
-    //     });
-    //     setTrucks(updatedTrucks);
-    //     updatedTrucks.forEach(async truck => {
-    //         const distance = await calculateDistance(truck.CityStateZip, value);
-    //         const updatedTruck = { ...truck, distance: distance ? Math.round(distance) : null };
-    //         setTrucks(prevTrucks => prevTrucks.map(prevTruck => prevTruck.ID === updatedTruck.ID ? updatedTruck : prevTruck));
-    //     });
-    // };
-    
     const handleDestinationChange = (value) => {
         localStorage.setItem('destination', value);
         setDestinationValue(value);
@@ -107,9 +89,8 @@ const EditableTable = () => {
     });
     const geocodeAddress = async (address) => {
         try {
-            const response = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=pk.eyJ1IjoiYmF0MzMzIiwiYSI6ImNtMGxoczk1cTA0emUycnF1anB0aGF4dW4ifQ.cirY7NRQxoPAfDuyAOUn-g`);
+            const response = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=pk.eyJ1IjoiY29ubmVjdDExMDUwIiwiYSI6ImNtM3lrYzUyejFtcDQyanIwbjU1cjU4NGoifQ._12OAosmpjk4dKHk8z9y0g`);
             const features = response.data.features;
-            console.log('Data',features);
             if (features.length > 0) {
                 const coordinates = features[0].center;
                 return coordinates;
@@ -122,37 +103,13 @@ const EditableTable = () => {
             return null;
         }
     };
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-    // Функция для выполнения запроса geocodeAddress с задержкой
-    const geocodeAddressWithDelay = async (address) => {
-        await delay(1000); // Задержка в 1 секунду перед выполнением запроса
-        return geocodeAddress(address);
-    };
-    // const geocodeAddress = async (address) => {
-    //     try {
-    //         const response = await axios.get(`https://geocode.maps.co/search?q=${encodeURIComponent(address)}&api_key=66d3023882680315730452bqw7b14bf`);
-    //         const data = response.data;
-    //         console.log('Data',data);
-    //         if (data && data.length > 0) {
-    //             const { lat, lon } = data[0];
-    //             return { lat, lon };
-    //         } else {
-    //             console.error('No coordinates found for the address:', address);
-    //             return null;
-    //         }
-    //     } catch (error) {
-    //         console.error('Error geocoding address:', error);
-    //         return null;
-    //     }
-    // };
     const calculateDistance = async (origin, destination) => {
         try {
-            const originCoordinates = await geocodeAddressWithDelay(origin);
-            const destinationCoordinates = await geocodeAddressWithDelay(destination);
+            const originCoordinates = await geocodeAddress(origin);
+            const destinationCoordinates = await geocodeAddress(destination);
 
             if (originCoordinates && destinationCoordinates) {
-                const response = await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${originCoordinates[0]},${originCoordinates[1]};${destinationCoordinates[0]},${destinationCoordinates[1]}?access_token=pk.eyJ1IjoiYmF0MzMzIiwiYSI6ImNtMGxoczk1cTA0emUycnF1anB0aGF4dW4ifQ.cirY7NRQxoPAfDuyAOUn-g`);
+                const response = await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${originCoordinates[0]},${originCoordinates[1]};${destinationCoordinates[0]},${destinationCoordinates[1]}?access_token=pk.eyJ1IjoiY29ubmVjdDExMDUwIiwiYSI6ImNtM3lrYzUyejFtcDQyanIwbjU1cjU4NGoifQ._12OAosmpjk4dKHk8z9y0g`);
                 const distance = response.data.routes[0].distance / 1609.34;
                 return distance;
             } else {
@@ -163,36 +120,6 @@ const EditableTable = () => {
             return null;
         }
     };
-    // const calculateDistance = async (origin, destination) => {
-    //     try {
-    //         const originCoordinates = await geocodeAddressWithDelay(origin);
-    //         const destinationCoordinates = await geocodeAddressWithDelay(destination);
-    
-    //         if (originCoordinates && destinationCoordinates) {
-    //             const [lat1, lon1] = originCoordinates;
-    //             const [lat2, lon2] = destinationCoordinates;
-                
-    //             const toRadians = (degree) => degree * (Math.PI / 180);
-    //             const R = 6371; // Радиус Земли в километрах
-    //             const dLat = toRadians(lat2 - lat1);
-    //             const dLon = toRadians(lon2 - lon1);
-    
-    //             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    //                       Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
-    //                       Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    
-    //             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    //             const distance = R * c; // Расстояние в километрах
-    
-    //             return distance * 0.621371; // Возвращаем расстояние в милях
-    //         } else {
-    //             return null;
-    //         }
-    //     } catch (error) {
-    //         console.error('Error calculating distance:', error);
-    //         return null;
-    //     }
-    // };
     const handleOkForm = async () => {
         try {
             const values = await form.validateFields();
@@ -570,7 +497,7 @@ const EditableTable = () => {
                         >
                             <InputMask
                                 key="cellPhone"
-                                mask={'(999) 999-9999'}
+                                mask={'999-999-9999'}
                                 autoComplete="off"
                                 className='mask'
                             >
