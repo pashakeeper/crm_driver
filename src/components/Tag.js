@@ -28,6 +28,14 @@ const StatusTag = ({ status }) => {
             color = '#00ffb7';
             style = {color: '#000', padding: '20px' }; // Рыжий цвет для статуса "Out of service"
             break;
+        case 'Local':
+            color = '#592906';
+            style = {color: '#fff', padding: '20px' };
+            break;
+        case 'New':
+            color = '#fc5a03';
+            style = {color: '#fff', padding: '20px' };
+            break;
         default:
             color = '#d9d9d9'; // Цвет по умолчанию для других статусов (серый)
     }

@@ -17,7 +17,7 @@ const RegistrationForm = ({ onFinish }) => {
 
   const handleRegistration = async (values) => {
     try {
-      const response = await axios.post(api + "/auth/register", values);
+      const response = await axios.post(api + "/register", values);
       message.success(response.data.message);
       onFinish();
     } catch (error) {
@@ -46,11 +46,7 @@ const RegistrationForm = ({ onFinish }) => {
         <Input.Password prefix={<UserOutlined />} placeholder="Password" />
       </Form.Item>
 
-      <Form.Item>
-        <Button className="mx-lg-auto d-flex" type="primary" htmlType="submit">
-          Register
-        </Button>
-      </Form.Item>
+      
     </Form>
   );
 };
@@ -66,7 +62,9 @@ const LoginForm = ({ onFinish }) => {
   const handleLogin = async (values) => {
     try {
       // eslint-disable-next-line
-      const response = await axios.post(api + "/auth/login", values);
+      const response = await axios.post(api + "/login", values);
+      console.log(values);
+      console.log('clicked');
       localStorage.setItem("isLoggedIn", "true");
       onFinish();
     } catch (error) {
