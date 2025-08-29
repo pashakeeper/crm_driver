@@ -140,7 +140,7 @@ const EditableTable = () => {
             const response = await axios.get(
                 `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
                     address
-                )}.json?access_token=pk.eyJ1IjoiY29ubmV4MSIsImEiOiJjbTU0M3BweG4ybTBmMmlzZHRjNWUzYmIwIn0.czn4foGfAMEto1NdjcJXWw`
+                )}.json?access_token=sk.eyJ1IjoiY29ubmV4MTIzNCIsImEiOiJjbTgxcGl1ZG8weXR1MmtzNnc4eW9vYmpjIn0.pQeztEZaqpks61Paf4g_pw`
             );
             const features = response.data.features;
             console.log("Data", features);
@@ -187,7 +187,7 @@ const EditableTable = () => {
 
             if (originCoordinates && destinationCoordinates) {
                 const response = await axios.get(
-                    `https://api.mapbox.com/directions/v5/mapbox/driving/${originCoordinates[0]},${originCoordinates[1]};${destinationCoordinates[0]},${destinationCoordinates[1]}?access_token=pk.eyJ1IjoiY29ubmV4MSIsImEiOiJjbTU0M3BweG4ybTBmMmlzZHRjNWUzYmIwIn0.czn4foGfAMEto1NdjcJXWw`
+                    `https://api.mapbox.com/directions/v5/mapbox/driving/${originCoordinates[0]},${originCoordinates[1]};${destinationCoordinates[0]},${destinationCoordinates[1]}?access_token=sk.eyJ1IjoiY29ubmV4MTIzNCIsImEiOiJjbTgxcGl1ZG8weXR1MmtzNnc4eW9vYmpjIn0.pQeztEZaqpks61Paf4g_pw`
                 );
                 const distance = response.data.routes[0].distance / 1609.34;
                 return distance;
